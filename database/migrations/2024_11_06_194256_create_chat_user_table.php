@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('chat_id');
-            $table->timestamps();
 
             $table->index('user_id', 'chat_user_user_idx');
             $table->index('chat_id', 'chat_user_chat_idx');
