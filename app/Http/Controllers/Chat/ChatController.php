@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 
 class ChatController extends Controller
 {
@@ -23,6 +24,10 @@ class ChatController extends Controller
             'user_id' => 'required|integer|exists:users,id',
             'type'=> 'required|string|max:10',
             'password' => 'string|nullable']);
+        //hash password
+        if(isset($data['password'])){
+            $data['password'] = Hash::make($data['password']);
+        }
         //create chat
         $chat = Chat::create($data);
         //sign in chat
