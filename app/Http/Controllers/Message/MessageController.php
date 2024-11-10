@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Message;
 
+use App\Events\MessageSent;
+use App\Events\MessageSubmitted;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
@@ -19,6 +21,8 @@ class MessageController extends Controller
         ]);
 
         $message = Message::create($data);
+
+        broadcast(new MessageSent($message));
 
         return response($message, Response::HTTP_CREATED);
     }

@@ -57,12 +57,12 @@ class ChatController extends Controller
         $chat = Chat::find($chatId);
         //check found
         if ($chat === null) {
-            return response("Chat with id {$chatId} not found", Response::HTTP_NOT_FOUND);
+            return response(['message'=> 'Chat with id {$chatId} not found'], Response::HTTP_NOT_FOUND);
         }
         //Check Type and Password
         if($chat->type === Chat::IS_PRIVATE){
             if($chat->password !== $password){
-                return response("Chat id: {$chatId}, {$password} incorrect", Response::HTTP_UNAUTHORIZED);
+                return response(['message'=> 'Chat id: {$chatId}, {$password} incorrect'], Response::HTTP_UNAUTHORIZED);
             }
         }
         //Sign in Chat
