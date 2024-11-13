@@ -1,5 +1,31 @@
-
 <script setup>
+import LogoIcon from '../images/LogoIcon.vue'
+import {useRouter} from 'vue-router'
+import useAuth from "../../services/authState";
+import {ref} from 'vue'
+import axios from "axios";
+
+const $router = useRouter(),
+    $auth = useAuth();
+
+const _email = ref(''),
+    _password = ref('')
+
+function login(){
+    axios.post('/auth/login', {email: _email.value, password: _password.value}).then(res => {
+        signin_modal.close()
+        $auth.isAuthenticated = true;
+        axios.get('/api/user').then(res => {
+            $auth.user = res.data
+        })
+        localStorage.setItem('isLoggedin', true)
+        $router.push({name: 'user.profile'});
+    }).catch(err => {
+        if(err.response){
+            console.log(err.response.data.message)
+        }
+    })
+}
 
 </script>
 
@@ -21,7 +47,7 @@
                 </div>
             </form>
             <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img class="mx-auto h-24 w-auto" src="images/chat.svg" alt="Chat-system" />
+                <logo-icon class="mx-auto h-24 w-auto"></logo-icon>
                 <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
             </div>
             <div class="my-6 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -29,7 +55,7 @@
                     <div>
                         <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
                         <div class="mt-2">
-                            <input id="email" name="email" type="email" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                            <input id="email" v-model="_email" name="email" type="email" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-1" />
                         </div>
                     </div>
 
@@ -38,11 +64,11 @@
                             <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
                         </div>
                         <div class="mt-2">
-                            <input id="password" name="password" type="password" autocomplete="current-password" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                            <input id="password" v-model="_password" name="password" type="password" autocomplete="current-password" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-1" />
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
+                        <button type="submit" @click.prevent="login" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
                     </div>
                 </form>
             </div>

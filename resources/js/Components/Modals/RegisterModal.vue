@@ -1,4 +1,33 @@
 <script setup>
+import LogoIcon from '../images/LogoIcon.vue'
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
+import useAuth from "../../services/authState";
+import axios from "axios";
+
+const $router = useRouter(),
+    $auth = useAuth();
+
+const _name = ref(''),
+    _email = ref(''),
+    _password = ref(''),
+    _password_comfirmation = ref('')
+
+function registration(){
+    axios.post('/auth/register', {name: _name.value, email: _email.value, password: _password.value, password_comfirmation: _password_comfirmation.value}).then(res => {
+        register_modal.close();
+        $auth.isAuthenticated = true;
+        axios.get('/api/user').then(res => {
+            $auth.user = res.data
+        })
+        localStorage.setItem('isLoggedin', true)
+        $router.push({name: 'user.profile'});
+    }).catch(err => {
+        if(err.response){
+            console.log(err.response.data.message)
+        }
+    })
+}
 
 </script>
 
@@ -20,7 +49,7 @@
                 </div>
             </form>
             <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img class="mx-auto h-24 w-auto" src="images/chat.svg" alt="Chat-system" />
+                <logo-icon class="mx-auto h-24 w-auto"></logo-icon>
                 <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Registration</h2>
             </div>
             <div class="my-6 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -28,14 +57,14 @@
                     <div>
                         <label for="name" class="block text-sm/6 font-medium text-gray-900">Name</label>
                         <div class="mt-2">
-                            <input id="name" name="name" type="text" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                            <input id="name" v-model="_name" name="name" type="text" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-1" />
                         </div>
                     </div>
 
                     <div>
                         <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
                         <div class="mt-2">
-                            <input id="email" name="email" type="email" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                            <input id="email" v-model="_email" name="email" type="email" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-1" />
                         </div>
                     </div>
 
@@ -44,7 +73,7 @@
                             <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
                         </div>
                         <div class="mt-2">
-                            <input id="password" name="password" type="password" autocomplete="current-password" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                            <input id="password" v-model="_password" name="password" type="password" autocomplete="current-password" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-1" />
                         </div>
                     </div>
 
@@ -53,11 +82,11 @@
                             <label for="password_comfirmation" class="block text-sm/6 font-medium text-gray-900">Password</label>
                         </div>
                         <div class="mt-2">
-                            <input id="password_comfirmation" name="password_comfirmation" type="password" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                            <input id="password_comfirmation" v-model="_password_comfirmation" name="password_comfirmation" type="password" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 pl-1" />
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
+                        <button type="submit" @click.prevent="registration" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Зарегистрироваться</button>
                     </div>
                 </form>
             </div>
