@@ -1,4 +1,7 @@
 import {createRouter, createWebHistory} from "vue-router";
+import useAuth from "../services/authState";
+
+const $auth = useAuth()
 
 const routes = [
     {
@@ -33,9 +36,15 @@ const routes = [
     },
 ];
 
-const index = createRouter({
+const router = createRouter({
     history: createWebHistory(),
     routes
 })
 
-export default index
+router.beforeEach(async (to, from) => {
+    if(!$auth.isAuthenticated && to.name !== 'chats.index'){
+        return {name: 'chats.index'}
+    }
+})
+
+export default router
