@@ -53,28 +53,43 @@ class ChatController extends Controller
         return response([], Response::HTTP_OK);
     }
 
-    public function signInChat($chatId, $userId, $password){
+    public function signInChat(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'chatId' => 'required|integer',
+            'userId' => 'required|integer',
+            'password' => 'string|nullable'
+        ]);
         //find a chat
-        $chat = Chat::find($chatId);
+        $chat = Chat::find($data['chatId']);
         //check found
         if ($chat === null) {
-            return response(['message'=> 'Chat with id {$chatId} not found'], Response::HTTP_NOT_FOUND);
+            return response()->json(['message'=> 'Chat with id {$chatId} not found'], Response::HTTP_NOT_FOUND);
         }
         //Check Type and Password
         if($chat->type === Chat::IS_PRIVATE){
-            if($chat->password !== $password){
-                return response(['message'=> 'Chat id: {$chatId}, {$password} incorrect'], Response::HTTP_UNAUTHORIZED);
+            if($chat->password !== $data['password']){
+                return response()->json(['message'=> 'Chat id: {$chatId}, {$password} incorrect'], Response::HTTP_UNAUTHORIZED);
             }
         }
         //Sign in Chat
-        $chat->users()->attach($userId);
+        $chat->users()->attach($data['userId']);
+
+        return response()->json(['message'=> 'User connect succesfully'], Response::HTTP_OK);
     }
 
-    public function logOutChat($chatId, $userId){
+    public function logOutChat(Request $request):JsonResponse
+    {
+        $data = $request->validate([
+            'chatId' => 'required|integer',
+            'userId' => 'required|integer',
+        ]);
         //findOrFailChat
-        $chat = Chat::find($chatId);
+        $chat = Chat::find($data['chatId']);
         //Logout Chat
-        $chat->users()->detach($userId);
+        $chat->users()->detach($data['userId']);
+
+        return response()->json(['message'=> 'Exiting the chat - ok'], Response::HTTP_OK);
     }
 
 }

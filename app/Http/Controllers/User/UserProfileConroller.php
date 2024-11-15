@@ -20,6 +20,7 @@ class UserProfileConroller extends Controller
     {
         $user = auth()->user();
 
+        // возвращать по дате присоединения к чату
         $chats = $user->chats()->latest()->get();
 
         return response()->json(ChatResource::collection($chats), Response::HTTP_OK);

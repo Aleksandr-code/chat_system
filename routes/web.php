@@ -23,6 +23,9 @@ Route::post('/chat', [ChatController::class, 'store']);
 Route::get('/chat/{chat}', [ChatController::class, 'show']);
 Route::delete('/chat/{chat}', [ChatController::class, 'destroy']);
 
+Route::post('/chat/sign', [ChatController::class, 'signInChat']);
+Route::post('/dashboard/chat/exit', [ChatController::class, 'logOutChat']);
+
 Route::get('/dashboard/user/chats', [UserProfileConroller::class, 'getChats']);
 Route::post('/chat/{chat}/message', [MessageController::class, 'store']);
 

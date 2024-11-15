@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -35,8 +36,13 @@ class MessageSent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'message' => $this->message->content,
-            'user_id' => $this->message->user_id
+            'data' => [
+                'id' => $this->message->id,
+                'content' => $this->message->content,
+                'created_at' => $this->message->created_at->diffForHumans(),
+                'user_id' => $this->message->user_id,
+                'user_name' => User::find($this->message->user_id)->name,
+            ]
         ];
     }
 

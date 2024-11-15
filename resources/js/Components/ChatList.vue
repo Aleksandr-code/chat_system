@@ -3,14 +3,13 @@
 import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import axios from "axios";
+import useAuth from "../services/authState";
 
-const $router = useRouter()
+const $router = useRouter(),
+    $auth = useAuth()
 const _chat_list = ref([])
 
 function getChats(){
-    // Данные дата - diffForHumans
-    // Вместе с user_id, user_name
-    // Количество участников в чате
     // Тип отредактировать
     axios.get('/chat')
         .then(res => {
@@ -22,7 +21,10 @@ function getChats(){
 function inputInChat(chat_id){
     // Проверить состоит ли пользователь в чате
     // Если нет, проверка на тип чата -> модальная форма
-    $router.push({name:'chats.show', params:{id: chat_id}})
+    axios.post('/chat/sign', {chatId: chat_id, userId: $auth.user.id, password: ''}).then(res => {
+        console.log(res)
+        $router.push({name:'chats.show', params:{id: chat_id}})
+    })
 }
 
 onMounted(() => {

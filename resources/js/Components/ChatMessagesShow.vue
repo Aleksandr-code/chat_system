@@ -1,6 +1,6 @@
 <script setup>
 
-import {onMounted, ref, watch} from "vue";
+import {onMounted, onUpdated, ref, watch} from "vue";
 import {useRoute} from 'vue-router'
 import useAuth from "../services/authState";
 import axios from "axios";
@@ -8,34 +8,47 @@ import axios from "axios";
 const $route = useRoute(),
     $auth = useAuth()
 const _messages = ref([]),
-    _message = ref('')
+    _message = ref(''),
+    _isLoading = ref(false)
 
-function getMessages(){
-    axios.get(`/chat/${$route.params.id}`).then(res => {
+async function getMessages(){
+    _isLoading.value = true
+    await axios.get(`/chat/${$route.params.id}`).then(res => {
         console.log(res.data)
         _messages.value = res.data
     })
+    _isLoading.value = false
 }
 
 function storeMessage(){
     axios.post(`/chat/${$route.params.id}/message`, {chat_id: $route.params.id,user_id: $auth.user.id, content: _message.value}).then(res => {
-        console.log(res.data)
+        //console.log(res.data)
+        // edit push date and user
         _messages.value.push(res.data)
     })
     _message.value= ''
 }
 
+function connectToMessageChannel(){
+    Echo.channel(`chats.${$route.params.id}`)
+        .listen('.message.sent', (e) => {
+        console.log(e)
+        _messages.value.push(e.data)
+    })
+}
+
 onMounted(() => {
     getMessages()
+    connectToMessageChannel()
 })
-
 
 </script>
 
 <template>
         <h1 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-2xl my-2 border-b-4 border-gray-500">Чат: name</h1>
         <div class="messages flex flex-col justify-between mb-5">
-            <div v-if="_messages.length > 0" class="chats">
+            <div v-if="_isLoading">Loading ...</div>
+            <div v-else-if="_messages.length !== 0" class="chats">
                 <template v-for="message in _messages" :key="message.id">
                     <div  class="chat" :class="Number(message.user_id) === $auth.user.id ? 'chat-end' : 'chat-start' ">
                         <div class="chat-header">
