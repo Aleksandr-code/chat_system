@@ -3,27 +3,27 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChatStoreRequest;
+use App\Http\Resources\ChatResource;
+use App\Http\Resources\MessageResource;
 use App\Models\Chat;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
 class ChatController extends Controller
 {
-    public function index(){
-
+    public function index(): JsonResponse
+    {
         $chats = Chat::latest()->get();
 
-        return response($chats, Response::HTTP_OK);
+        return response()->json(ChatResource::collection($chats), Response::HTTP_CREATED);
     }
 
-    public function store(Request $request){
+    public function store(ChatStoreRequest $request){
         //validate request
-        $data = $request->validate([
-            'title' => 'required|string',
-            'user_id' => 'required|integer|exists:users,id',
-            'type'=> 'required|string|max:10',
-            'password' => 'string|nullable']);
+        $data = $request->validated();
         //hash password
         if(isset($data['password'])){
             $data['password'] = Hash::make($data['password']);
@@ -36,11 +36,12 @@ class ChatController extends Controller
         return response($chat, Response::HTTP_CREATED);
     }
 
-    public function show(Chat $chat){
+    public function show(Chat $chat): JsonResponse
+    {
         //all messages in the chat
         $chatMessages = $chat->messages()->get();
         // return
-        return response($chatMessages, Response::HTTP_OK);
+        return response()->json(MessageResource::collection($chatMessages), Response::HTTP_OK);
     }
 
     public function destroy(Chat $chat){

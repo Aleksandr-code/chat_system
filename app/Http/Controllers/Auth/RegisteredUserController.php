@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisteredUserRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -11,25 +13,19 @@ use Illuminate\Support\Facades\Hash;
 
 class RegisteredUserController extends Controller
 {
-    public function store(Request $request): Response
+    public function store(RegisteredUserRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:'.User::class,
-            'password' => 'string|', 'confirmed',
-        ]);
+        $data = $request->validated();
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $data['password'] = Hash::make($data['password']);
+
+        $user = User::create($data);
 
         // event (new Registered($user));
 
         Auth::login($user);
 
-        return response($user, Response::HTTP_CREATED);
+        return response()->json($user, Response::HTTP_CREATED);
 
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ChatResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -14,13 +16,13 @@ class UserProfileConroller extends Controller
         //
     }
 
-    public function getChats(): Response
+    public function getChats(): JsonResponse
     {
         $user = auth()->user();
 
-        $chats = $user->chats()->get();
+        $chats = $user->chats()->latest()->get();
 
-        return response($chats, Response::HTTP_OK);
+        return response()->json(ChatResource::collection($chats), Response::HTTP_OK);
 
     }
 }

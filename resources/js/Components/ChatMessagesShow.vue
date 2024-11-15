@@ -39,8 +39,8 @@ onMounted(() => {
                 <template v-for="message in _messages" :key="message.id">
                     <div  class="chat" :class="Number(message.user_id) === $auth.user.id ? 'chat-end' : 'chat-start' ">
                         <div class="chat-header">
-                            {{message.user_id}}
-                            <time class="text-xs opacity-50">{{message.created_at}} (2 hours ago)</time>
+                            {{message.user_name}}
+                            <time class="text-xs opacity-50">({{message.created_at}})</time>
                         </div>
                         <div class="chat-bubble">{{message.content}}</div>
                     </div>

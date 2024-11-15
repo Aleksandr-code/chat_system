@@ -3,30 +3,29 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginUserRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class LoginUserController extends Controller
 {
-    public function store(Request $request): Response
+    public function store(LoginUserRequest $request): JsonResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $credentials = $request->validated();
 
         if (Auth::attempt($credentials)) {
 
             $request->session()->regenerate();
 
-            return response(['message' => 'Successfully logged in'], Response::HTTP_OK);
+            return response()->json(['message' => 'Successfully logged in'], Response::HTTP_OK);
         }
 
-        return response(['message' => 'Invalid login details'], Response::HTTP_UNAUTHORIZED);
+        return response()->json(['message' => 'Invalid login details'], Response::HTTP_UNAUTHORIZED);
     }
 
-    public function destroy(Request $request): Response
+    public function destroy(Request $request): JsonResponse
     {
         Auth::guard('web')->logout();
 
@@ -34,6 +33,6 @@ class LoginUserController extends Controller
 
         $request->session()->regenerateToken();
 
-        return response(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }

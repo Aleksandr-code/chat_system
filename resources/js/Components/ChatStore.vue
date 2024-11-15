@@ -2,8 +2,10 @@
 import {ref} from 'vue'
 import axios from "axios";
 import useAuth from "../services/authState";
+import {useRouter} from "vue-router";
 
-const $auth = useAuth()
+const $auth = useAuth(),
+    $router = useRouter()
 const _title = ref(''),
     _type = ref('public'),
     _password = ref('')
@@ -14,6 +16,7 @@ const IS_PRIVATE = 'private'
 function storeMessage(){
     axios.post('/chat', {title: _title.value, user_id: $auth.user.id, type: _type.value, password: _password.value}).then(res => {
         console.log(res.data)
+        $router.push({name:'user.chats'})
     })
 }
 

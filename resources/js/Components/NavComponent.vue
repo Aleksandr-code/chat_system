@@ -8,7 +8,7 @@
             <div class="max-w-md">
                 <ul class="menu menu-vertical lg:menu-horizontal bg-base-100 rounded-box">
                     <li><RouterLink :to="{name:'user.profile'}">Профиль</RouterLink></li>
-                    <li><RouterLink :to="{name:'user.chats'}">Мои чаты (1)</RouterLink></li>
+                    <li><RouterLink :to="{name:'user.chats'}">Мои чаты (㋛)</RouterLink></li>
                     <li><RouterLink :to="{name:'chats.create'}">Создать новый чат</RouterLink></li>
                 </ul>
             </div>
