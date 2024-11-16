@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ChatResource;
+use App\Http\Resources\UserChatsResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,9 +21,9 @@ class UserProfileConroller extends Controller
         $user = auth()->user();
 
         // возвращать по дате присоединения к чату
-        $chats = $user->chats()->latest()->get();
+        $chats = $user->chats()->get();
 
-        return response()->json(ChatResource::collection($chats), Response::HTTP_OK);
+        return response()->json(UserChatsResource::collection($chats), Response::HTTP_OK);
 
     }
 }

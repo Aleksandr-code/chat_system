@@ -1,10 +1,16 @@
 <script setup>
-import {onMounted, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import axios from "axios";
 import useAuth from "../services/authState";
 
 const $auth = useAuth()
 const _user_chats = ref([])
+
+const _user_chats_sortBy_date = computed( () => {
+    return _user_chats.value.sort((a, b) => {
+        return new Date(b.user_time_sign) - new Date(a.user_time_sign)
+    })
+})
 
 function getUserChats(){
     axios.get('/dashboard/user/chats')
@@ -18,6 +24,7 @@ function exitFromChat(chat_id){
     //сообщение с подтверждением выхода из чата
     axios.post('/dashboard/chat/exit', {chatId: chat_id, userId: $auth.user.id}).then(res => {
         console.log(res.data)
+        // рассмотреть как лучше обновить список чатов
         getUserChats()
     })
 }
@@ -31,7 +38,7 @@ onMounted(() => {
 <template>
     <div class="chat-table">
         <ul role="list" class="divide-y divide-gray-400">
-            <li v-for="chat in _user_chats" :key="chat.id" class="flex justify-between gap-x-6 py-5">
+            <li v-for="chat in _user_chats_sortBy_date" :key="chat.id" class="flex justify-between gap-x-6 py-5">
                 <div class="flex min-w-0 gap-x-4">
                     <div class="min-w-0 flex-auto">
                         <div class="flex items-start gap-x-3">

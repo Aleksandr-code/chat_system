@@ -19,7 +19,7 @@ class MessageController extends Controller
 
         $message = Message::create($data);
 
-        broadcast(new MessageSent($message))->toOthers();
+//        broadcast(new MessageSent($message))->toOthers();
 
         return response($message, Response::HTTP_CREATED);
     }

@@ -1,13 +1,20 @@
 <script setup>
 
-import {onMounted, ref} from 'vue'
+import {onMounted, onUpdated, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import axios from "axios";
 import useAuth from "../services/authState";
+import ChatPrivateModal from "./Modals/ChatPrivateModal.vue"
 
 const $router = useRouter(),
     $auth = useAuth()
-const _chat_list = ref([])
+const _chat_list = ref([]),
+    _chat_join_id = ref()
+
+const IS_PUBLIC = 'public'
+const IS_PRIVATE = 'private'
+
+
 
 function getChats(){
     // Тип отредактировать
@@ -18,10 +25,41 @@ function getChats(){
         })
 }
 
-function inputInChat(chat_id){
+async function inputInChat(chat_id, chat_type){
+    // проверка аутентифицирован ли пользователь
+    if(!$auth.isAuthenticated){
+        alert('вход в чат доступен только авторизованных пользователям')
+        return false
+    }
     // Проверить состоит ли пользователь в чате
+    const userHasChat = await axios.get('/dashboard/user/chats')
+        .then(res => {
+            const hasChat = res.data.some((chat) => {
+                return chat.id === chat_id
+            })
+            if(hasChat){
+                $router.push({name:'chats.show', params:{id: chat_id}})
+            }
+            return hasChat;
+        })
     // Если нет, проверка на тип чата -> модальная форма
-    axios.post('/chat/sign', {chatId: chat_id, userId: $auth.user.id, password: ''}).then(res => {
+    if(!userHasChat){
+        if(chat_type === IS_PRIVATE){
+            document.querySelector('#chat_private_modal').showModal()
+            _chat_join_id.value = chat_id
+        } else {
+            await joinToChat(chat_id, '')
+        }
+    }
+}
+
+function passwordGetEmit(password){
+    joinToChat(_chat_join_id.value, password)
+}
+
+function joinToChat(chat_id, password = ''){
+    // присоединение к чату
+    axios.post('/chat/sign', {chatId: chat_id, userId: $auth.user.id, password: password}).then(res => {
         console.log(res)
         $router.push({name:'chats.show', params:{id: chat_id}})
     })
@@ -30,6 +68,7 @@ function inputInChat(chat_id){
 onMounted(() => {
     getChats()
 })
+
 
 </script>
 
@@ -72,7 +111,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="flex flex-none gap-6 justify-between items-center">
-                        <button @click="inputInChat(chat.id)" class="btn btn-sm btn-outline">Войти</button>
+                        <button @click="inputInChat(chat.id, chat.type)" class="btn btn-sm btn-outline">Войти</button>
                         <div class="flex gap-2 items-center text-gray-500">
                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"></path></svg>
                             <dd class="text-sm pb-px">{{chat.users_count}}</dd>
@@ -82,6 +121,8 @@ onMounted(() => {
             </ul>
         </div>
     </div>
+
+    <chat-private-modal @pass-input="passwordGetEmit"></chat-private-modal>
 </template>
 
 <style scoped>

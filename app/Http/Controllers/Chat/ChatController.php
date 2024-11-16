@@ -7,6 +7,7 @@ use App\Http\Requests\ChatStoreRequest;
 use App\Http\Resources\ChatResource;
 use App\Http\Resources\MessageResource;
 use App\Models\Chat;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -30,8 +31,10 @@ class ChatController extends Controller
         }
         //create chat
         $chat = Chat::create($data);
+        //Add time sign
+        $time_sign = Carbon::now()->toDateTimeString();
         //sign in chat
-        $chat->users()->attach($chat->user_id);
+        $chat->users()->attach($chat->user_id, ['time_sign' => $time_sign]);
         //return
         return response($chat, Response::HTTP_CREATED);
     }
@@ -68,12 +71,14 @@ class ChatController extends Controller
         }
         //Check Type and Password
         if($chat->type === Chat::IS_PRIVATE){
-            if($chat->password !== $data['password']){
+            if(!Hash::check($data['password'], $chat->password)){
                 return response()->json(['message'=> 'Chat id: {$chatId}, {$password} incorrect'], Response::HTTP_UNAUTHORIZED);
             }
         }
+        //Add time sign
+        $time_sign = Carbon::now()->toDateTimeString();
         //Sign in Chat
-        $chat->users()->attach($data['userId']);
+        $chat->users()->attach($data['userId'], ['time_sign' => $time_sign]);
 
         return response()->json(['message'=> 'User connect succesfully'], Response::HTTP_OK);
     }

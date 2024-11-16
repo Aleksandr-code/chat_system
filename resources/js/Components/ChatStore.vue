@@ -41,7 +41,7 @@ function storeMessage(){
         </div>
     </fieldset>
     <div  class="my-5">
-        <input v-if="_type === IS_PRIVATE " type="password" placeholder="password" class="input input-bordered w-full max-w-xs" />
+        <input v-if="_type === IS_PRIVATE" v-model="_password" type="password" placeholder="password" class="input input-bordered w-full max-w-xs" />
     </div>
     <button @click.prevent="storeMessage" class="btn btn-primary">Создать</button>
 
