@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Message;
 use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MessageStoreRequest;
+use App\Http\Resources\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
 use Illuminate\Http\Request;
@@ -24,9 +25,9 @@ class MessageController extends Controller
 
         $message = Message::create($data);
 
-//        broadcast(new MessageSent($message))->toOthers();
+        broadcast(new MessageSent($message))->toOthers();
 
-        return response($message, Response::HTTP_CREATED);
+        return response(new MessageResource($message), Response::HTTP_CREATED);
     }
 
 

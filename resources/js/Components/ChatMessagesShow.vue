@@ -1,15 +1,17 @@
 <script setup>
 
-import {onMounted, onUpdated, ref, watch} from "vue";
+import {onMounted, ref} from "vue";
 import {useRoute} from 'vue-router'
 import useAuth from "../services/authState";
 import axios from "axios";
 
 const $route = useRoute(),
     $auth = useAuth()
+
 const _messages = ref([]),
     _message = ref(''),
     _isLoading = ref(false)
+
 
 async function getMessages(){
     _isLoading.value = true
@@ -30,11 +32,21 @@ function storeMessage(){
 }
 
 function connectToMessageChannel(){
+    // type => public
     Echo.channel(`chats.${$route.params.id}`)
         .listen('.message.sent', (e) => {
+        console.log('public')
         console.log(e)
         _messages.value.push(e.data)
     })
+    // type => private
+    /*Echo.private(`chats.${$route.params.id}`)
+        .listen('.message.sent', (e) => {
+            console.log('private')
+            console.log(e)
+            _messages.value.push(e.data)
+        })
+     */
 }
 
 onMounted(() => {
