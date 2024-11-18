@@ -24,8 +24,6 @@ class MessageStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'chat_id' => 'required|integer|exists:chats,id',
-            'user_id' => 'required|integer|exists:users,id',
             'content' => 'required|string'
         ];
     }

@@ -21,7 +21,7 @@ async function getMessages(){
 }
 
 function storeMessage(){
-    axios.post(`/chat/${$route.params.id}/message`, {chat_id: $route.params.id,user_id: $auth.user.id, content: _message.value}).then(res => {
+    axios.post(`/chat/${$route.params.id}/message`, {content: _message.value}).then(res => {
         //console.log(res.data)
         // edit push date and user
         _messages.value.push(res.data)

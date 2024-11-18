@@ -1,9 +1,7 @@
 <script setup>
 import {computed, onMounted, ref} from 'vue'
 import axios from "axios";
-import useAuth from "../services/authState";
 
-const $auth = useAuth()
 const _user_chats = ref([])
 
 const _user_chats_sortBy_date = computed( () => {
@@ -22,9 +20,12 @@ function getUserChats(){
 
 function exitFromChat(chat_id){
     //сообщение с подтверждением выхода из чата
-    axios.post('/dashboard/chat/exit', {chatId: chat_id, userId: $auth.user.id}).then(res => {
+    axios.post('/dashboard/chat/exit', {chatId: chat_id}).then(res => {
         console.log(res.data)
-        // рассмотреть как лучше обновить список чатов
+        // Как лучше обновить список чатов
+        // case 1: получены все чаты из backend -> обновление на фронтенде
+        // case 2: через пагинацию получена часть чатов -> при удалении запрос на бэкенд
+        // критерии: количество чатов у пользователя + частота покиданий чатов
         getUserChats()
     })
 }

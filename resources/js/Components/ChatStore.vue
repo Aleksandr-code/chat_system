@@ -1,11 +1,9 @@
 <script setup>
 import {ref} from 'vue'
 import axios from "axios";
-import useAuth from "../services/authState";
 import {useRouter} from "vue-router";
 
-const $auth = useAuth(),
-    $router = useRouter()
+const $router = useRouter()
 const _title = ref(''),
     _type = ref('public'),
     _password = ref('')
@@ -13,8 +11,8 @@ const _title = ref(''),
 const IS_PUBLIC = 'public'
 const IS_PRIVATE = 'private'
 
-function storeMessage(){
-    axios.post('/chat', {title: _title.value, user_id: $auth.user.id, type: _type.value, password: _password.value}).then(res => {
+function storeChat(){
+    axios.post('/chat', {title: _title.value, type: _type.value, password: _password.value}).then(res => {
         console.log(res.data)
         $router.push({name:'user.chats'})
     })
@@ -43,7 +41,7 @@ function storeMessage(){
     <div  class="my-5">
         <input v-if="_type === IS_PRIVATE" v-model="_password" type="password" placeholder="password" class="input input-bordered w-full max-w-xs" />
     </div>
-    <button @click.prevent="storeMessage" class="btn btn-primary">Создать</button>
+    <button @click.prevent="storeChat" class="btn btn-primary">Создать</button>
 
 </template>
 

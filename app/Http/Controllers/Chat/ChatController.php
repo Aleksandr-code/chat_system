@@ -19,7 +19,7 @@ class ChatController extends Controller
     {
         $chats = Chat::latest()->get();
 
-        return response()->json(ChatResource::collection($chats), Response::HTTP_CREATED);
+        return response()->json(ChatResource::collection($chats), Response::HTTP_OK);
     }
 
     public function store(ChatStoreRequest $request){
@@ -29,6 +29,8 @@ class ChatController extends Controller
         if(isset($data['password'])){
             $data['password'] = Hash::make($data['password']);
         }
+        //add user, that created the chat
+        $data['user_id'] = auth()->user()->id;
         //create chat
         $chat = Chat::create($data);
         //Add time sign
@@ -41,6 +43,8 @@ class ChatController extends Controller
 
     public function show(Chat $chat): JsonResponse
     {
+        //authorize to show
+        $this->authorize('view', $chat);
         //all messages in the chat
         $chatMessages = $chat->messages()->get();
         // return
@@ -48,6 +52,8 @@ class ChatController extends Controller
     }
 
     public function destroy(Chat $chat){
+        //authorize to delete
+        $this->authorize('delete', $chat);
         //logout all users
         $chat->users()->detach();
         //delete chat
@@ -60,7 +66,6 @@ class ChatController extends Controller
     {
         $data = $request->validate([
             'chatId' => 'required|integer',
-            'userId' => 'required|integer',
             'password' => 'string|nullable'
         ]);
         //find a chat
@@ -78,7 +83,7 @@ class ChatController extends Controller
         //Add time sign
         $time_sign = Carbon::now()->toDateTimeString();
         //Sign in Chat
-        $chat->users()->attach($data['userId'], ['time_sign' => $time_sign]);
+        $chat->users()->attach($request->user()->id, ['time_sign' => $time_sign]);
 
         return response()->json(['message'=> 'User connect succesfully'], Response::HTTP_OK);
     }
@@ -87,12 +92,11 @@ class ChatController extends Controller
     {
         $data = $request->validate([
             'chatId' => 'required|integer',
-            'userId' => 'required|integer',
         ]);
         //findOrFailChat
         $chat = Chat::find($data['chatId']);
         //Logout Chat
-        $chat->users()->detach($data['userId']);
+        $chat->users()->detach($request->user()->id);
 
         return response()->json(['message'=> 'Exiting the chat - ok'], Response::HTTP_OK);
     }

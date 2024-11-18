@@ -19,20 +19,26 @@ use App\Http\Controllers\User\UserProfileConroller;
 */
 
 Route::get('/chat', [ChatController::class, 'index']);
-Route::post('/chat', [ChatController::class, 'store']);
-Route::get('/chat/{chat}', [ChatController::class, 'show']);
-Route::delete('/chat/{chat}', [ChatController::class, 'destroy']);
 
-Route::post('/chat/sign', [ChatController::class, 'signInChat']);
-Route::post('/dashboard/chat/exit', [ChatController::class, 'logOutChat']);
+Route::middleware('auth')->group(function () {
+    Route::post('/chat', [ChatController::class, 'store']);
+    //сообщения посмотреть может только тот кто состоит в этом чате
+    Route::get('/chat/{chat}', [ChatController::class, 'show']);
+    //удалить может только тот кому чат принаджедит
+    Route::delete('/chat/{chat}', [ChatController::class, 'destroy']);
 
-Route::get('/dashboard/user/chats', [UserProfileConroller::class, 'getChats']);
-Route::post('/chat/{chat}/message', [MessageController::class, 'store']);
+    Route::post('/chat/sign', [ChatController::class, 'signInChat']);
+    Route::post('/dashboard/chat/exit', [ChatController::class, 'logOutChat']);
+
+    Route::get('/dashboard/user/chats', [UserProfileConroller::class, 'getChats']);
+    //добавить сообщение можно только в тот чат в котором состоишь
+    Route::post('/chat/{chat}/message', [MessageController::class, 'store']);
+});
 
 Route::prefix('/auth')->group(function(){
     Route::post('/register', [RegisteredUserController::class, 'store']);
     Route::post('/login', [LoginUserController::class, 'store']);
-    Route::post('/logout', [LoginUserController::class, 'destroy'])->middleware('auth:sanctum');
+    Route::post('/logout', [LoginUserController::class, 'destroy'])->middleware('auth');
 });
 
 Route::get('{page}', function () {

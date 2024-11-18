@@ -59,7 +59,7 @@ function passwordGetEmit(password){
 
 function joinToChat(chat_id, password = ''){
     // присоединение к чату
-    axios.post('/chat/sign', {chatId: chat_id, userId: $auth.user.id, password: password}).then(res => {
+    axios.post('/chat/sign', {chatId: chat_id, password: password}).then(res => {
         console.log(res)
         $router.push({name:'chats.show', params:{id: chat_id}})
     })

@@ -25,7 +25,6 @@ class ChatStoreRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
-            'user_id' => 'required|integer|exists:users,id',
             'type'=> 'required|string|max:10',
             'password' => 'string|nullable'
         ];
