@@ -2,6 +2,15 @@
 
 Чат - система, реализованная с помощью laravel и vue.
 
+Запуск:
+1) Склонировать репозиторий `git clone`
+2) Скопировать `.env.example` файл как `.env` указать данные БД
+3) Run `composer install`
+4) Run `php artisan key:generate`
+5) Run `php artisan migrate`
+6) Run `php artisan serve` для локальной разработки
+7) Run `npm run dev`
+
 Функционал (реализован):
 1) Своя аутентификация
 2) Авторизация доступа к чатам.
