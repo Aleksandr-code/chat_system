@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Message;
+namespace App\Http\Controllers\Chat\Message;
 
 use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
@@ -8,7 +8,6 @@ use App\Http\Requests\MessageStoreRequest;
 use App\Http\Resources\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
