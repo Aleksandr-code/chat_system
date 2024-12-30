@@ -53,4 +53,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class);
     }
+
+    public function isMember(Chat $chat):bool
+    {
+        return (bool)$chat->users()->wherePivot('user_id', $this->id)->first();
+    }
 }

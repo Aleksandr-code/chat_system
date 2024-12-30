@@ -30,7 +30,7 @@ class ChatPolicy
      */
     public function view(User $user, Chat $chat)
     {
-        return $chat->users()->wherePivot('user_id', $user->id)->first();
+        return $user->isMember($chat);
     }
 
     /**
